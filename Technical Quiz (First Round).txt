@@ -1,0 +1,354 @@
+       Technical Quiz (First Round)
+
+
+     Structure:
+                      Logo designs - 10Q
+         Jumbling sentences - 5Q
+                Keyboard Shortcuts - 5Q
+ Technical things(simple) - 5Q
+                          AI Tech  - 5Q
+                        HTML & CSS - 10Q
+       Puzzels / Matching/ Images  - 10Q
+
+
+
+
+
+                                       Logo Designs
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. A half-bitten fruit logo, usually silver, black, or white.
+A) Samsung B) Apple C) Sony D) LG
+
+
+2. Golden arches shaped like an "M."
+A) Burger King B) KFC C) McDonald's D) Subway
+
+3. A green mermaid inside a circle.
+A) Costa Coffee B) Starbucks C) Café Coffee Day D) Barista
+
+
+4. A colorful multi-window logo (blue, red, green, yellow squares).
+A) Google B) Windows/Microsoft C) Intel D) IBM
+
+5. A simple check mark/tick-like "swoosh" symbol.
+A) Adidas B) Puma C) Nike D) Reebok
+
+1. A four-ringed logo, associated with a German luxury car brand.
+A) BMW B) Audi C) Mercedes-Benz D) Volkswagen
+(Answer: B)
+
+2. A three-pointed star inside a circle, a German car brand.
+A) Mercedes-Benz B) BMW C) Porsche D) Volvo
+
+
+3. A logo with a lion figure, used by an Indian/French car brand.
+A) Tata Motors B) Peugeot C) Renault D) Mahindra
+
+
+4. An owl or open-book style logo, commonly used by ed-tech platforms in India for online learning.
+A) BYJU'S B) Unacademy C) Vedantu D) (any of these fit — pick the one you're targeting)
+(Note: adjust this one to a specific real platform's actual logo shape before using — owl/book descriptions vary by platform, so verify visually)
+
+5. A stylized swoosh-like "tick," but in a different color/style used by a global sportswear brand for lifestyle apparel.
+A) Under Armour B) Puma C) Nike D) Adidas
+ 
+
+
+  					Jumbled sentences
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Unscramble: NPYOTH → (PYTHON)
+Unscramble: UTOCEPMR → (COMPUTER)
+Unscramble: EYKORABD → (KEYBOARD)
+
+2 — Hard Jumbled Word Puzzles
+Unscramble: CJTOBEIRNOTDE → (OBJECT ORIENTED — two-word answer)
+Unscramble: OMCPILIENRAT → (COMPILATION)
+
+     
+ 					Keyboard Shortcuts
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1. What does Ctrl + Shift + N do in most browsers?
+A) New tab B) New incognito/private window C) New bookmark D) New download
+(Answer: B)
+
+2. What does F12 commonly open in most browsers?
+A) Bookmarks bar B) Developer tools/inspector C) Print preview D) Full screen
+(Answer: B)
+
+3. What does Windows key + L do?
+A) Log out completely B) Lock the screen C) Open Library D) Launch last app
+(Answer: B)
+
+4. What does Ctrl + Shift + V do (in most text/document apps)?
+A) Paste with formatting B) Paste as plain text (no formatting) C) View clipboard history D) Validate spelling  
+ 
+5. What does Ctrl + P do?
+A) Print B) Paste C) Preview D) Pause
+(Answer: A)
+
+
+                                            TECHNICAL
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1. Which programming language is known as the "language of the web"?
+
+A. Python
+
+B. JavaScript
+
+C. C++
+
+D. Java
+
+ Answer: B
+
+2.Which Windows version is Microsoft's current flagship desktop operating system in 2026?
+
+A. Windows 10
+
+B. Windows 11
+
+C. Windows 12
+
+D. Windows XP
+
+ Answer: B
+
+3.Which company develops the Safari browser?
+
+A. Google
+
+B. Apple
+
+C. Microsoft
+
+D. Samsung
+
+ Answer: B
+
+4.Which company develops Claude AI?
+
+A. Anthropic
+
+B. OpenAI
+
+C. Meta
+
+D. Microsoft
+
+  Answer: A
+
+5.Which is the latest stable Android version in 2026?
+
+A. Android 14
+
+B. Android 15
+
+C. Android 16
+
+D. Android 17
+
+  Answer: C
+                                                
+
+   					  AI Tech
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1. Which AI tool is primarily used for generating text, answering questions, and assisting with coding?
+A) Canva B) ChatGPT C) Midjourney D) Runway
+(Answer: B)
+
+2. Which AI tool is developed by Google and can assist with text, reasoning, coding, and multimodal tasks?
+A) Gemini B) Canva C) Figma D) Notion
+(Answer: A)
+
+3. Which AI tool is commonly used to improve grammar, spelling, and writing style?
+A) Runway B) Grammarly C) Cursor D) Midjourney
+(Answer: B)
+
+4. Which AI tool is particularly useful for AI-assisted research and finding information with cited sources?
+A) Perplexity B) Paint C) VLC D) Eclipse
+(Answer: A)
+
+5. Which AI tool is particularly useful for AI-assisted research and finding information with cited sources?
+A)paint B) Perplexity C) VLC D) Eclipse
+(Answer: B)
+
+
+                                         HTML AND CSS
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1.Which tag is a semantic HTML element?
+A. <div> B. <span> C. <section> D. <font>
+Answer: C
+
+2.Which HTML input type hides typed characters?
+A. hidden B. secret C. password D. text
+Answer: C
+
+3.Which CSS property adds space inside an element?
+A. margin B. padding C. border D. gap
+Answer: B
+
+4.Which property rounds the corners of a box?
+A. corner-radius B. border-radius C. radius
+
+D. round-border
+
+  Answer: B
+
+5.Which CSS has the highest priority?
+
+A. External CSS
+
+B. Internal CSS
+
+C. Inline CSS
+
+D. Browser default CSS
+
+  Answer: C
+
+6. Which HTML5 tag should contain the primary content of a webpage?
+
+A. <section>
+
+B. <main>
+
+C. <article>
+
+D. <body>
+
+  Answer: B
+
+7 Which tag groups introductory content?
+
+A. <header>
+
+B. <top>
+
+C. <head>
+
+D. <intro>
+
+  Answer: A
+
+8.  Which attribute makes a field mandatory?
+
+A. compulsory
+
+B. validate
+
+C. required
+
+D. important
+
+  Answer: C
+
+9.Which HTML tag is used for creating a numbered list?
+
+A. <ul>
+
+B. <ol>
+
+C. <li>
+
+D. <dl>
+
+  Answer: B  
+
+10. Which HTML tag is used for navigation links?
+
+A. <menu>
+
+B. <nav>
+
+C. <navigation>
+
+D. <header>
+
+ Answer: B            
+
+
+                                         Puzzles
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ Missing Number
+1.What number should replace ?
+2, 6, 12, 20, 30, ?
+A) 36 B) 40 C) 42 D) 44
+(Answer: C) Pattern: 1×2, 2×3, 3×4, 4×5, 5×6, 6×7
+
+2.Find the Odd One Out?
+16, 25, 36, 49, 63, 81
+A) 25 B) 36 C) 63 D) 81
+(Answer: C) All others are perfect squares.
+
+3. Find the Number
+I am a two-digit number.
+My tens digit is twice my units digit.
+The sum of my digits is 9.
+What am I?
+A) 36 B) 63 C) 45 D) 72
+(Answer: B)
+
+4.If CAT = DBU Then DOG = ?
+A) EPH B) EOG C) FPH D) DPH
+(Answer: A)
+
+5.A man is found dead on Sunday morning.
+
+His wife says she was sleeping.
+The cook says he was preparing breakfast.
+The gardener says he was planting flowers.
+The maid says she was getting the mail.
+
+Who is lying?
+A) Wife B) Cook C) Gardener D) Maid
+(Answer: D) Maid
+                                	Matchings
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Column A  Column B
+1. HTML        A. Database
+2. CSS        B. Structure
+3. JavaScript C. Styling
+4. MySQL D. Interactivity
+ Answer:1 → B 2 → C 3 → D 4 → A
+
+Column A    Column B
+1. CPU        A. Permanent storage
+2. RAM        B. Processes instructions
+3. HDD        C. Temporary memory
+4. GPU        D. Graphics processing
+Answer: 1-B, 2-C, 3-A, 4-D
+
+Column A   Column B
+1. VS Code A. Web browser
+2. Chrome B. Code editor
+3. Git        C. Database
+4. MySQL D. Version control
+Answer: 1-B, 2-A, 3-D, 4-C
+
+
+Column A Column B
+1. .jpg A. Portable Network Graphics
+2. .png        B. Graphics Interchange Format
+3. .gif        C. Joint Photographic Experts Group
+4. .webp D. Web Picture
+Answer: 1-C, 2-A, 3-B, 4-D
+
+Column A Column B
+1. Python A. James Gosling
+2. Java        B. Dennis Ritchie
+3. C        C. Bjarne Stroustrup
+4. C++        D. Guido van Rossum
+Answer: 1-D, 2-A, 3-B, 4-C    

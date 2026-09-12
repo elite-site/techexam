@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+*.lognode_modules/
+dist/
+*.log
+.env
+server/.env
+client/.env
+.DS_Store

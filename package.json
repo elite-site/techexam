@@ -1,0 +1,15 @@
+{
+  "name": "elite-examination-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ELITE Online Examination Management System - Student & Admin Portals",
+  "scripts": {
+    "setup": "npm --prefix server install && npm --prefix client install",
+    "seed": "npm --prefix server run seed",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server run start",
+    "loadtest": "node load-test/simulate.js"
+  }
+}
