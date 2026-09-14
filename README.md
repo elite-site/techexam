@@ -113,3 +113,5 @@ queuing through the Supabase pooler's 15 sessions + network RTT).
 - The Supabase project's direct host is IPv6-only; the app connects through the IPv4
   pooler (`aws-0-ap-northeast-1.pooler.supabase.com:5432`, SSL, `rejectUnauthorized: false`).
 - Never expose `ADMIN` credentials in the student portal.
+
+# techexam
