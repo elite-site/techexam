@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: techexam
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm run setup && npm run build
+    startCommand: npm run start
+    preDeployCommand: npm run seed
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20.x"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_STUDENT_SECRET
+        sync: false
+      - key: JWT_ADMIN_SECRET
+        sync: false
+      - key: ADMIN_USERNAME
+        value: ADMIN
+      - key: ADMIN_PASSWORD
+        value: ADMIN123
