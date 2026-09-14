@@ -4,6 +4,7 @@ const config = require('./config');
 const pool = new Pool({
   connectionString: config.databaseUrl,
   ssl: { rejectUnauthorized: false },
+  family: 4, // Supabase direct host is IPv6-only; force IPv4 pooler
   max: 14, // keep under the Supabase pooler's 15-session cap; excess sockets are rejected (EMAXCONNSESSION)
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 30000,
