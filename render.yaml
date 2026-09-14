@@ -4,9 +4,8 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm run setup && npm run build
+    buildCommand: npm run build
     startCommand: npm run start
-    preDeployCommand: npm run seed
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:

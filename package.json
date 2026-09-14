@@ -4,12 +4,13 @@
   "private": true,
   "description": "ELITE Online Examination Management System - Student & Admin Portals",
   "scripts": {
+    "preinstall": "npm --prefix server install && npm --prefix client install",
     "setup": "npm --prefix server install && npm --prefix client install",
     "seed": "npm --prefix server run seed",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
     "build": "npm --prefix client run build",
-    "start": "npm --prefix server run start",
+    "start": "npm run seed && npm --prefix server run start",
     "loadtest": "node load-test/simulate.js"
   }
 }

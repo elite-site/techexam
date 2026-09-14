@@ -176,8 +176,13 @@ async function main() {
   await seedAdmin();
   console.log('[2/5] tests + admin ready');
 
-  const imp = await importStudents(config.excelPath);
-  console.log(`[3/5] students imported -> processed ${imp.processed}, total in DB ${imp.total}`);
+  const existing = await query('SELECT COUNT(*)::int AS c FROM students');
+  if (existing.rows[0].c > 0 && !FORCE) {
+    console.log(`[3/5] students already present (${existing.rows[0].c}), skipping import`);
+  } else {
+    const imp = await importStudents(config.excelPath);
+    console.log(`[3/5] students imported -> processed ${imp.processed}, total in DB ${imp.total}`);
+  }
 
   const src = sourcePack();
   if (src.kind.startsWith('odt')) console.log('[4/5] question source: NEW .odt files' + (src.kind.includes('codebugging') ? ' + CODEBUGGING.txt' : ''));
