@@ -2,7 +2,7 @@ const express = require('express');
 const { query } = require('../db');
 const { requireStudent } = require('../auth');
 const exam = require('../exam');
-const { debugRunMeta } = require('../debugCheck');
+const { debugRunMeta, rubric } = require('../debugCheck');
 const runC = require('../runC');
 
 const router = express.Router();
@@ -301,6 +301,8 @@ router.post('/tests/:id/run', async (req, res) => {
     // question's sample input. Correct shows the real output; otherwise the
     // console shows the error type WITHOUT exposing the exact erroring line.
     const meta = debugRunMeta(q);
+    const rub = rubric(q);
+    meta.forbidden = [...new Set((meta.forbidden || []).concat(rub.forbidden || []))];
     const resrun = await runC(code, meta);
     return res.json({ result: resrun.result, console: resrun.console });
   } catch (e) {

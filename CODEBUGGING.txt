@@ -1,0 +1,676 @@
+Q1 
+
+//Description: Find the second largest distinct element among 5 integers.
+
+ Buggy Code
+
+
+#include <stdio.h>
+
+int main() {
+    int a[5], i;
+    int largest, second;
+
+    printf("Enter 5 elements:\n");
+
+    for(i = 0; i <= 5; i++)          // ❌ ERROR 1
+        scanf("%d", a[i]);           // ❌ ERROR 2
+
+    largest = a[0];
+    second = a[1];
+
+    for(i = 1; i < 5; i++) {
+        if(a[i] > largest) {
+            second = largest;
+            largest = a[i];
+        }
+        else if(a[i] < second) {     // ❌ ERROR 3
+            second = a[i];
+        }
+    }
+
+    printf("Second largest = %d", second)  // ❌ ERROR 4
+
+    printf("Thank you!");
+
+    return 1;                        // ❌ ERROR 5
+}
+
+
+
+ Corrected Code
+
+
+
+#include <stdio.h>
+
+int main() {
+    int a[5], i;
+    int largest, second;
+
+    printf("Enter 5 elements:\n");
+
+    for(i = 0; i < 5; i++)
+        scanf("%d", &a[i]);
+
+    largest = a[0];
+    second = a[1];
+
+    for(i = 1; i < 5; i++) {
+        if(a[i] > largest) {
+            second = largest;
+            largest = a[i];
+        }
+        else if(a[i] > second && a[i] != largest) {
+            second = a[i];
+        }
+    }
+
+    printf("Second largest = %d", second);
+
+    printf("Thank you!");
+
+    return 0;
+}
+
+
+
+Q2 
+
+//Description: Check whether a given 3-digit number is an Armstrong number.
+
+
+ Buggy Code
+
+
+#include <stdo.h>                     // ❌ ERROR 1
+
+int main() {
+    int n, temp, digit, sum = 1;       // ❌ ERROR 2
+
+    printf("Enter a 3-digit number: ");
+    scanf("%d", n);                    // ❌ ERROR 3
+
+    temp = n;
+
+    while(temp >= 0) {                 // ❌ ERROR 4
+        digit = temp % 10;
+        sum = sum + digit * digit;     // ❌ ERROR 5
+        temp = temp / 10;
+    }
+
+    if(sum = n)                        // ❌ ERROR 6
+        printf("Armstrong number\n");
+    else
+        printf("Not an Armstrong number\n");
+
+    printf("Sum = %d\n", sum)          // ❌ ERROR 6
+
+    return 0;
+}
+
+
+Corrected Code
+
+
+#include <stdio.h>
+
+int main() {
+    int n, temp, digit, sum = 0;
+
+    printf("Enter a 3-digit number: ");
+    scanf("%d", &n);
+
+    temp = n;
+
+    while(temp > 0) {
+        digit = temp % 10;
+        sum = sum + digit * digit * digit;
+        temp = temp / 10;
+    }
+
+    if(sum == n)
+        printf("Armstrong number\n");
+    else
+        printf("Not an Armstrong number\n");
+
+    printf("Sum = %d\n", sum);
+
+    return 0;
+}
+
+
+Q3 
+
+Description: Multiply two 3 × 3 matrices and display the resultant matrix.
+
+
+ Buggy Code
+
+
+#include <stdio.h>
+
+int main() {
+    int a[3][3], b[3][3], c[3][3];
+    int i, j, k;
+
+    printf("Enter elements of Matrix A:\n");
+
+    for(i = 0; i < 3; i++) {         
+        for(j = 0; j < 3; j++) {
+            scanf("%d", &a[I][j]);             // ❌ ERROR 1
+
+        }
+    }
+
+    printf("Enter elements of Matrix B:\n");
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j < 3; j++) {
+            scanf("%d", b[i][j]);             // ❌ ERROR 2
+        }
+    }
+
+    for(i = 0; i <= 3; i++) {                  // ❌ ERROR 3
+        for(j = 0; j < 3; j++) {
+
+            c[i][j] = 1;                       // ❌ ERROR 4
+
+            for(k = 0; k < 3; k++) {
+                c[i][j] = a[i][k] * b[k][j];  // ❌ ERROR 5
+            }
+        }
+    }
+
+    printf("\nResultant Matrix:\n");
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j <= 3; j++) {              // ❌ ERROR 6
+            printf("%d ", c[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("Matrix multiplication completed\n");
+
+    return 0;
+}
+
+ Corrected Code
+
+
+#include <stdio.h>
+
+int main() {
+    int a[3][3], b[3][3], c[3][3];
+    int i, j, k;
+
+    printf("Enter elements of Matrix A:\n");
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j < 3; j++) {
+            scanf("%d", &a[i][j]);
+        }
+    }
+
+    printf("Enter elements of Matrix B:\n");
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j < 3; j++) {
+            scanf("%d", &b[i][j]);
+        }
+    }
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j < 3; j++) {
+
+            c[i][j] = 0;
+
+            for(k = 0; k < 3; k++) {
+                c[i][j] += a[i][k] * b[k][j];
+            }
+        }
+    }
+
+    printf("\nResultant Matrix:\n");
+
+    for(i = 0; i < 3; i++) {
+        for(j = 0; j < 3; j++) {
+            printf("%d ", c[i][j]);
+        }
+        printf("\n");
+    }
+
+    printf("Matrix multiplication completed\n");
+
+    return 0;
+}
+
+
+Q4 
+
+//Description: Sort an array in ascending order using Bubble Sort and search for a given element using Binary Search.
+
+ Buggy Code
+#include <stdio.h>
+
+int main() {
+    int a[7], n, i, j, temp;
+    int key, low, high, mid, found = 0;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d elements:\n", n);
+
+    for(i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    /* Bubble Sort */
+    for(i = 0; i < n - 1; i++) {
+        for(j = 0; j < n - i - 1; j++) {
+
+            if(a[j] < a[j + 1]) {              // ❌ ERROR 1
+                temp = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nSorted Array:\n");
+
+    for(i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\nEnter element to search: ");
+    scanf("%d", &key);
+
+    low = 0;
+    high = n;                                  // ❌ ERROR 2
+
+    while(low <= high) {
+        mid = (low + high) / 2;
+
+        if(a[mid] == key) {
+            found = 1;
+            break;
+        }
+        else if(a[mid] < key) {                // ❌ ERROR 3
+            low = mid - 1;                     // ❌ ERROR 4
+        }
+        else {
+            high = mid + 1;                    // ❌ ERROR 5
+        }
+    }
+
+    if(found = 1) {                             // ❌ ERROR 6
+        printf("Element found at position %d\n", mid); // ❌ ERROR 7
+    }
+    else {
+        printf("Element not found\n");
+    }
+
+    printf("Search completed.\n");
+
+    return 0;
+}
+
+
+ Corrected Code
+
+
+#include <stdio.h>
+
+int main() {
+    int a[7], n, i, j, temp;
+    int key, low, high, mid, found = 0;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d elements:\n", n);
+
+    for(i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    /* Bubble Sort */
+    for(i = 0; i < n - 1; i++) {
+        for(j = 0; j < n - i - 1; j++) {
+
+            if(a[j] > a[j + 1]) {
+                temp = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nSorted Array:\n");
+
+    for(i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\nEnter element to search: ");
+    scanf("%d", &key);
+
+    low = 0;
+    high = n - 1;
+
+    while(low <= high) {
+        mid = (low + high) / 2;
+
+        if(a[mid] == key) {
+            found = 1;
+            break;
+        }
+        else if(a[mid] > key) {
+            high = mid - 1;
+        }
+        else {
+            low = mid + 1;
+        }
+    }
+
+    if(found == 1) {
+        printf("Element found at position %d\n", mid + 1);
+    }
+    else {
+        printf("Element not found\n");
+    }
+
+    printf("Search completed.\n");
+
+    return 0;
+}
+
+ Student Records Using Dynamic Memory
+
+//Description: Dynamically store student details, calculate their average marks, identify the student with the highest average, and copy the top student's record.
+
+ Buggy Code
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Student {
+    char name[30];
+    int marks[3];
+    float average;
+};
+
+int main() {
+    int n, i, j;
+    float total;
+    struct Student *s;
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    s = (struct Student *)malloc(n * sizeof(struct Student));
+
+    if (s == NULL) {
+        printf("Memory allocation failed\n");
+        return 1;
+    }
+
+    for (i = 0; i < n; i++) {
+        printf("\nEnter name: ");
+        scanf("%29s", s[i].name);
+
+        total = 0;
+
+        printf("Enter 3 marks: ");
+        for (j = 0; j < 3; j++) {
+            scanf("%d", &s[i].marks[j]);
+            total += s[i].marks[j];
+        }
+
+        s[i].average = total / 3;
+    }
+
+    for (i = 0; i < n; i++) {
+        if (s[i].average > 100) {              // ❌ ERROR 1
+            s[i].average = 100;
+        }
+    }
+
+    int highest = 0;
+
+    for (i = 1; i < n; i++) {
+        if (s[i].average > s[highest].average) {
+            highest = i;
+        }
+    }
+
+    printf("\nTop Student: %s\n", s[highest].name);
+    printf("Average: %.2f\n", s[highest].average);
+
+    struct Student copy;
+
+    memcpy(&copy, s, sizeof(s));               // ❌ ERROR 2
+
+    printf("\nCopied Student: %s\n", copy.name);
+
+    s[highest].average = s[highest].average / 3; // ❌ ERROR 3
+
+    if (strcmp(s[highest].name, copy.name))    // ❌ ERROR 4
+        printf("Names are same\n");
+    else
+        printf("Names are different\n");
+
+    printf("Address of top student: %d\n", &s[highest]); // ❌ ERROR 5
+
+    printf("Top student: %s\n", s[highest].name);
+
+    free(s);
+
+    printf("Top student: %s\n", s[highest].name);       // ❌ ERROR 6
+
+    return 0;
+}
+
+
+ Corrected Code
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Student {
+    char name[30];
+    int marks[3];
+    float average;
+};
+
+int main() {
+    int n, i, j;
+    float total;
+    struct Student *s;
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    s = (struct Student *)malloc(n * sizeof(struct Student));
+
+    if (s == NULL) {
+        printf("Memory allocation failed\n");
+        return 1;
+    }
+
+    for (i = 0; i < n; i++) {
+        printf("\nEnter name: ");
+        scanf("%29s", s[i].name);
+
+        total = 0;
+
+        printf("Enter 3 marks: ");
+        for (j = 0; j < 3; j++) {
+            scanf("%d", &s[i].marks[j]);
+            total += s[i].marks[j];
+        }
+
+        s[i].average = total / 3;
+    }
+
+    for (i = 0; i < n; i++) {
+        if (s[i].average < 0) {
+            s[i].average = 0;
+        }
+    }
+
+    int highest = 0;
+
+    for (i = 1; i < n; i++) {
+        if (s[i].average > s[highest].average) {
+            highest = i;
+        }
+    }
+
+    printf("\nTop Student: %s\n", s[highest].name);
+    printf("Average: %.2f\n", s[highest].average);
+
+    struct Student copy;
+
+    memcpy(&copy, &s[highest], sizeof(struct Student));
+
+    printf("\nCopied Student: %s\n", copy.name);
+
+    s[highest].average = s[highest].average;
+
+    if (strcmp(s[highest].name, copy.name) == 0)
+        printf("Names are same\n");
+    else
+        printf("Names are different\n");
+
+    printf("Address of top student: %p\n", (void *)&s[highest]);
+
+    printf("Top student: %s\n", s[highest].name);
+
+    free(s);
+    s = NULL;
+
+    return 0;
+}
+
+
+Q6 
+
+//Description: Find the largest element, calculate the sum and average, display the array, and access its last element using recursion and pointers.
+
+ 
+Buggy Code
+
+
+#include <stdio.h>
+
+int findLargest(int a[], int n) {
+    if (n == 1)
+        return a[0];
+
+    int largest = findLargest(a, n - 1);
+
+    if (a[n] > largest) {                         // ❌ ERROR 1
+        largest = a[n];
+    }
+
+    return largest;
+}
+
+int findSum(int a[], int n) {
+    if (n == 0)
+        return 0;
+
+    return a[n] + findSum(a, n - 1);              // ❌ ERROR 2
+}
+
+void displayArray(int a[], int n) {
+    if (n == 0)
+        return;
+
+    printf("%d ", a[n - 1]);
+    displayArray(a, n - 1);
+}
+
+int main() {
+    int a[] = {12, 45, 7, 89, 34};
+    int n = 5;
+
+    int largest = findLargest(a, n);
+    int sum = findSum(a, n);
+
+    printf("Largest element = %d\n", largest);
+    printf("Sum of elements = %d\n", sum);
+
+    printf("Average = %.2f\n", (float)sum / (n - 1)); // ❌ ERROR 3
+
+    printf("Array: ");
+    displayArray(a, n);
+
+    printf("\nNumber of elements = %d\n", sizeof(a)); // ❌ ERROR 4
+
+    int *ptr = a + n;
+
+    printf("Last element = %d\n", *ptr);              // ❌ ERROR 5
+
+    return 0;
+}
+
+
+ Corrected Code
+
+
+#include <stdio.h>
+
+int findLargest(int a[], int n) {
+    if (n == 1)
+        return a[0];
+
+    int largest = findLargest(a, n - 1);
+
+    if (a[n - 1] > largest) {
+        largest = a[n - 1];
+    }
+
+    return largest;
+}
+
+int findSum(int a[], int n) {
+    if (n == 0)
+        return 0;
+
+    return a[n - 1] + findSum(a, n - 1);
+}
+
+void displayArray(int a[], int n) {
+    if (n == 0)
+        return;
+
+    printf("%d ", a[n - 1]);
+    displayArray(a, n - 1);
+}
+
+int main() {
+    int a[] = {12, 45, 7, 89, 34};
+    int n = 5;
+
+    int largest = findLargest(a, n);
+    int sum = findSum(a, n);
+
+    printf("Largest element = %d\n", largest);
+    printf("Sum of elements = %d\n", sum);
+
+    printf("Average = %.2f\n", (float)sum / n);
+
+    printf("Array: ");
+    displayArray(a, n);
+
+    printf("\nNumber of elements = %d\n", n);
+
+    int *ptr = a + n - 1;
+
+    printf("Last element = %d\n", *ptr);
+
+    return 0;
+}

@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 const config = require('./config');
 const { query } = require('./db');
 const { importStudents } = require('./importStudents');
-const { parseQuizFile, parseDebug } = require('./importQuestions');
+const { parseQuizFile, parseDebug, extractOdtText, parseNewRound1, parseNewRound2, parseNewDebug, parseCodebuggingFile } = require('./importQuestions');
 const { toSelectable } = require('./questionOptions');
 
 const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '8', 10);
@@ -137,6 +137,36 @@ async function seedQuestions(testId, questions, defaultMarks) {
   return questions.length;
 }
 
+function fileExists(p) {
+  try { fs.accessSync(p); return true; } catch (e) { return false; }
+}
+
+// Prefer the uploaded NEW-*.odt question sets when present.
+function sourcePack() {
+  const r1 = config.resolveRel('../NEW-ROUND-1.odt');
+  const r2 = config.resolveRel('../NEW-ROUND-2.odt');
+  const dbg = config.resolveRel('../NEW-DEBUGGING.odt');
+  const cb = config.resolveRel('../CODEBUGGING.txt');
+  // Debugging questions come from CODEBUGGING.txt when present.
+  const debug = fileExists(cb)
+    ? parseCodebuggingFile(fs.readFileSync(cb, 'utf8'))
+    : fileExists(dbg) ? parseNewDebug(extractOdtText(dbg)) : [];
+  if (fileExists(r1) && fileExists(r2)) {
+    return {
+      kind: fileExists(cb) ? 'odt+codebugging' : 'odt',
+      round1: parseNewRound1(extractOdtText(r1)),
+      round2: parseNewRound2(extractOdtText(r2)),
+      debug,
+    };
+  }
+  return {
+    kind: 'txt',
+    round1: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round1,
+    round2: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round2,
+    debug: fileExists(cb) ? debug : parseDebug(fs.readFileSync(config.debugPath, 'utf8')),
+  };
+}
+
 async function main() {
   console.log('=== ELITE seed ===');
   await ensureSchema();
@@ -149,16 +179,18 @@ async function main() {
   const imp = await importStudents(config.excelPath);
   console.log(`[3/5] students imported -> processed ${imp.processed}, total in DB ${imp.total}`);
 
-  const quiz1 = parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8'));
-  applyOverrides(quiz1.round1);
-  applyOverrides(quiz1.round2);
-  const nR1 = await seedQuestions(ids['quiz|1'], quiz1.round1, 1);
-  const nR2 = await seedQuestions(ids['quiz|2'], quiz1.round2, 1);
+  const src = sourcePack();
+  if (src.kind.startsWith('odt')) console.log('[4/5] question source: NEW .odt files' + (src.kind.includes('codebugging') ? ' + CODEBUGGING.txt' : ''));
+  else console.log('[4/5] question source: original .txt files');
+  applyOverrides(src.round1);
+  applyOverrides(src.round2);
+  const nR1 = await seedQuestions(ids['quiz|1'], src.round1, 1);
+  const nR2 = await seedQuestions(ids['quiz|2'], src.round2, 1);
   await convertSelectableText(ids['quiz|1']);
   await convertSelectableText(ids['quiz|2']);
-  console.log(`[4/5] round1 questions=${quiz1.round1.length} (seeded ${nR1}), round2 questions=${quiz1.round2.length} (seeded ${nR2})`);
+  console.log(`[4/5] round1 questions=${src.round1.length} (seeded ${nR1}), round2 questions=${src.round2.length} (seeded ${nR2})`);
 
-  const debugQ = parseDebug(fs.readFileSync(config.debugPath, 'utf8'));
+  const debugQ = src.debug;
   const nDbg = await seedQuestions(ids['debugging|null'], debugQ, 5);
   await convertSelectableText(ids['debugging|null']);
   console.log(`[5/5] debugging questions=${debugQ.length} (seeded ${nDbg})`);

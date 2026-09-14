@@ -1,10 +1,32 @@
 const fs = require('fs');
+const { execFileSync } = require('child_process');
 
 // ==========================================================================
 // Parsers for the provided question text files.
 // Technical Quiz (First Round).txt  -> 30 questions Round 1, 20 questions Round 2
 // debugquestion.txt                 -> 6 debugging problems
+// NEW-ROUND-1.odt / NEW-ROUND-2.odt / NEW-DEBUGGING.odt -> replacement sets
 // ==========================================================================
+
+// Extract readable text out of an OpenDocument (text) zip container.
+function extractOdtText(filePath) {
+  const xml = execFileSync('unzip', ['-p', filePath, 'content.xml'], { maxBuffer: 16 * 1024 * 1024 }).toString('utf8');
+  const paras = [];
+  const re = /<text:p\b[^>]*>([\s\S]*?)<\/text:p>/g;
+  let m;
+  while ((m = re.exec(xml)) !== null) {
+    let inner = m[1];
+    inner = inner.replace(/<text:line-break\s*\/>/g, '\n');
+    inner = inner.replace(/<text:tab\s*\/>/g, '\t');
+    inner = inner.replace(/<text:s\b[^>]*\/>/g, ' ');
+    inner = inner.replace(/<[^>]+>/g, '');
+    inner = inner
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#10;/g, '\n');
+    paras.push(inner);
+  }
+  return paras;
+}
 
 const has = (re, str) => re.test(str);
 
@@ -233,4 +255,167 @@ function parseQuizFile(text) {
   };
 }
 
-module.exports = { parseQuizFile, parseDebug, parseMCQSection, parseStudentsFromWorkbook: null };
+// ==========================================================================
+// Parsers for the NEW .odt question sets (all-MCQ rounds + code debugging)
+// ==========================================================================
+
+// Unified parser for the new .odt MCQs. Every question ends with an "Answer:" line.
+// "numbered" additionally strips the explicit "N. " prefix from each question.
+function parseNewMCQ(paras, numbered) {
+  const lines = paras
+    .flatMap((p) => p.split('\n'))
+    .map((l) => l.trim())
+    .filter((l) => l !== '');
+  if (lines.length) {
+    lines[0] = lines[0].replace(/^\s*ROUND\s*[-–—]?\s*\d*\s*/i, '');
+    lines[0] = lines[0].replace(/^\d+[.)]\s*/, '');
+  }
+  const isOptionLine = (l) => {
+    const tr = l.trim();
+    if (/^[ABCD][.)]\s?[^)]/.test(tr)) return true;
+    const ms = tr.match(/\b[ABCD][.)]/g);
+    return !!(ms && ms.length >= 2);
+  };
+  const out = [];
+  let buf = [];
+  const finish = (ansLine) => {
+    const letter = (ansLine.match(/\b([A-Da-d])\b/) || [])[1];
+    let optStart = buf.length;
+    while (optStart > 0 && isOptionLine(buf[optStart - 1])) optStart--;
+    const optLines = buf.slice(optStart);
+    const opts = {};
+    for (const ol of optLines) {
+      const om = ol.match(/^([ABCD])[.)]\s*(.*)$/);
+      if (!om) {
+        const mks = [...ol.matchAll(/\b([ABCD])[.)]/g)];
+        for (const mk of mks) {
+          const after = ol.slice(mk.index + 2);
+          const next = mk.index + 2 + Math.max(0, ol.slice(mk.index + 2).search(/\b[ABCD][.)]/));
+          opts[mk[1].toUpperCase()] = ol.slice(mk.index + 2, next).trim();
+        }
+      } else {
+        opts[om[1].toUpperCase()] = om[2];
+      }
+    }
+    let text = buf.slice(0, optStart).join('\n').trim();
+    if (numbered) text = text.replace(/^\d+[.)]\s*/, '');
+    buf = [];
+    if (!letter || !opts.A || !opts.B || !opts.C || !opts.D) return;
+    out.push({
+      question_text: text,
+      question_type: 'mcq',
+      option_a: opts.A,
+      option_b: opts.B,
+      option_c: opts.C,
+      option_d: opts.D,
+      correct_answer: letter.toUpperCase(),
+    });
+  };
+  for (const line of lines) {
+    if (/^\s*(?:Answer|Ans)\s*[:=.-]/i.test(line)) finish(line);
+    else buf.push(line);
+  }
+  return out;
+}
+
+// NEW-ROUND-1: numbered MCQs.
+function parseNewRound1(paras) {
+  return parseNewMCQ(paras, true);
+}
+
+// NEW-ROUND-2: unnumbered MCQs.
+function parseNewRound2(paras) {
+  return parseNewMCQ(paras, false);
+}
+
+// NEW-DEBUGGING: blocks of (buggy program ... "Answer:" ... explanation + fixed lines).
+// Blocks are delimited by their "#include <stdio.h>" opening line.
+const FIX_LINE_RE = /^\s*(int\s+original\b|scanf\s*\(|for\s*\(|if\s*\(|printf\s*\(|largest\s*=|smallest\s*=|break\s*;|return\b|[a-zA-Z_]\w*\s*=\s*|[{}])/;
+function isFixLine(l) {
+  if (!l || /^(Answer|Correct|The|A\s|before the loop|When|One)\b/i.test(l.trim())) return false;
+  if (/^[a-zA-Z]{3,}\s+[a-zA-Z]+[^;=)(]*$/.test(l.trim())) return false; // prose sentence
+  return FIX_LINE_RE.test(l);
+}
+function parseNewDebug(paras) {
+  const lines = paras.map((p) => p.trim()).filter((p) => p !== '');
+  const starts = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^(?:\d+[.)]\s*-?[A-Za-z-]*)?#include\s*<stdio\.h>/i.test(lines[i])) starts.push(i);
+  }
+  const out = [];
+  for (let s = 0; s < starts.length; s++) {
+    const endIdx = s + 1 < starts.length ? starts[s + 1] : lines.length;
+    const block = lines.slice(starts[s], endIdx);
+    block[0] = block[0].replace(/^\d+[.)]\s*-?[A-Za-z-]*#include/i, '#include');
+    const ansIdx = block.findIndex((l) => /^\s*Answer\s*[:=.-]/i.test(l));
+    if (ansIdx <= 0) continue;
+    const code = block.slice(0, ansIdx).join('\n');
+    const answer = block.slice(ansIdx + 1);
+    const fixedLines = answer.filter(isFixLine);
+    out.push({
+      question_text: `Identify and fix the error(s) in the following C program. Write the corrected line(s) / code.\n\n${code}`,
+      question_type: 'code',
+      correct_answer: fixedLines.join('\n'),
+    });
+  }
+  return out;
+}
+
+// ==========================================================================
+// Parser for CODEBUGGING.txt: Q-blocks each holding a Description, a
+// "Buggy Code" section and a "Corrected Code" section.  Answer annotations
+// ("// ❌ ERROR n") are stripped so students only ever see the question.
+// ==========================================================================
+function stripAnswerMarks(line) {
+  return line.replace(/\s*\/\/\s*❌.*$/, '').replace(/❌/g, '').replace(/\s+$/, '');
+}
+
+function extractCodeBlock(lines) {
+  const start = lines.findIndex((l) => /^\s*#include\b/.test(l));
+  if (start < 0) return '';
+  let end = lines.length - 1;
+  while (end > start && lines[end].trim() !== '}') end--;
+  return lines.slice(start, end + 1).map(stripAnswerMarks).join('\n').trim();
+}
+
+function parseCodebuggingFile(text) {
+  const lines = text.split(/\r?\n/);
+  const qStarts = [];
+  lines.forEach((l, i) => { if (/^Q\d+\s*$/.test(l.trim())) qStarts.push(i); });
+  const rawBlocks = qStarts.map((s, k) => lines.slice(s, k + 1 < qStarts.length ? qStarts[k + 1] : lines.length));
+  // A block missing its "QN" header (e.g. Q5) is detected via a second
+  // Description line inside the previous block and split off.
+  const blocks = [];
+  for (const seg of rawBlocks) {
+    const descIdx = [];
+    seg.forEach((l, i) => { if (/Description:/.test(l)) descIdx.push(i); });
+    if (descIdx.length > 1) {
+      blocks.push(seg.slice(0, descIdx[1]));
+      blocks.push(seg.slice(descIdx[1]));
+    } else {
+      blocks.push(seg);
+    }
+  }
+  const out = [];
+  for (const b of blocks) {
+    const descLine = b.find((l) => /Description:/.test(l)) || '';
+    const description = descLine.replace(/^.*?Description:\s*/, '').trim();
+    const bugIdx = b.findIndex((l) => /Buggy\s*Code/i.test(l));
+    const fixIdx = b.findIndex((l) => /Corrected\s*Code/i.test(l));
+    if (bugIdx < 0 || fixIdx < 0 || fixIdx <= bugIdx) continue;
+    const buggy = extractCodeBlock(b.slice(bugIdx + 1, fixIdx));
+    const fixed = extractCodeBlock(b.slice(fixIdx + 1));
+    if (!buggy || !fixed) continue;
+    out.push({
+      description,
+      buggy,
+      fixed,
+      question_text: `Identify and fix the error(s) in the following C program. Write the corrected line(s) / code.\n\n${description ? '// ' + description + '\n\n' : ''}${buggy}`,
+      question_type: 'code',
+      correct_answer: fixed,
+    });
+  }
+  return out;
+}
+
+module.exports = { parseQuizFile, parseDebug, parseMCQSection, extractOdtText, parseNewRound1, parseNewRound2, parseNewDebug, parseCodebuggingFile, parseStudentsFromWorkbook: null };
