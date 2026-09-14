@@ -33,6 +33,15 @@ function extractPrompt(text) {
   return cut > -1 ? s.slice(0, cut).trim() : s.trim();
 }
 
+// Human labels for the console error kinds returned by the Run endpoint.
+// Deliberately describes only the *type* of error, never the exact line.
+const CONSOLE_LABELS = {
+  compilation: 'Compilation error',
+  runtime: 'Runtime error',
+  logical: 'Logical error',
+  output: 'Output',
+};
+
 function questionOptions(q) {
   return [
     { k: 'A', v: q.option_a },
@@ -42,7 +51,7 @@ function questionOptions(q) {
   ].filter((o) => o.v && String(o.v).trim() !== '');
 }
 
-function QuestionBlock({ q, index, answer, onChange, runState, onRun }) {
+function QuestionBlock({ q, index, answer, onChange, runState, runConsole, onRun }) {
   const { letter = '', value = '' } = answer || {};
   if (q.question_type === 'mcq') {
     const opts = questionOptions(q);
@@ -118,6 +127,18 @@ function QuestionBlock({ q, index, answer, onChange, runState, onRun }) {
             <span className="rounded-full bg-red-50 text-red-600 border border-red-200 px-3 py-1 text-sm font-semibold">Error</span>
           )}
         </div>
+        {runConsole && (
+          <div className={`mt-3 rounded-lg border overflow-hidden ${runState === 'Correct' ? 'border-emerald-200' : 'border-red-200'}`}>
+            <div className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider ${runState === 'Correct' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'}`}>
+              {runState === 'Correct' ? 'Output console' : 'Error console'}
+            </div>
+            <pre className={`bg-slate-900 text-[12px] leading-relaxed font-mono px-3 py-2.5 whitespace-pre-wrap max-h-56 overflow-auto ${runState === 'Correct' ? 'text-emerald-300' : 'text-red-300'}`}>
+              {runState === 'Correct'
+                ? runConsole.text
+                : `${CONSOLE_LABELS[runConsole.kind] || 'Error'}: ${runConsole.text}`}
+            </pre>
+          </div>
+        )}
       </div>
     );
   }
@@ -154,6 +175,7 @@ export default function StudentTest() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(null);
   const [runStates, setRunStates] = useState({}); // qid -> '' | running | Correct | Error
+  const [runConsoles, setRunConsoles] = useState({}); // qid -> {kind, text}
   const answersRef = useRef(answers);
   const saveTimer = useRef(null);
   const submittedRef = useRef(null);
@@ -187,11 +209,14 @@ export default function StudentTest() {
 
   const doRun = useCallback(async (q, code) => {
     setRunStates((prev) => ({ ...prev, [q.id]: 'running' }));
+    setRunConsoles((prev) => ({ ...prev, [q.id]: null }));
     try {
       const res = await request(`/student/tests/${testId}/run`, 'POST', { question_id: q.id, code });
       setRunStates((prev) => ({ ...prev, [q.id]: res.result === 'Correct' ? 'Correct' : 'Error' }));
+      setRunConsoles((prev) => ({ ...prev, [q.id]: res.console || null }));
     } catch (_) {
       setRunStates((prev) => ({ ...prev, [q.id]: 'Error' }));
+      setRunConsoles((prev) => ({ ...prev, [q.id]: { kind: 'runtime', text: 'Could not run the program.' } }));
     }
   }, [testId]);
 
@@ -432,11 +457,13 @@ export default function StudentTest() {
               index={current}
               answer={answers[q.id] || { letter: '', value: '' }}
               runState={runStates[q.id] || ''}
+              runConsole={runConsoles[q.id] || null}
               onRun={doRun}
               onChange={(v) => {
                 const shaped = typeof v === 'string' ? { letter: v, value: '' } : v;
                 setAnswerFor(q.id, shaped);
                 setRunStates((prev) => ({ ...prev, [q.id]: '' }));
+                setRunConsoles((prev) => ({ ...prev, [q.id]: null }));
                 scheduleSave();
               }}
             />

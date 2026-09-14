@@ -2,7 +2,8 @@ const express = require('express');
 const { query } = require('../db');
 const { requireStudent } = require('../auth');
 const exam = require('../exam');
-const { isDebugFixCorrect } = require('../debugCheck');
+const { debugRunMeta } = require('../debugCheck');
+const runC = require('../runC');
 
 const router = express.Router();
 router.use(requireStudent);
@@ -42,7 +43,7 @@ router.get('/tests', async (req, res) => {
     const byTest = new Map(attempts.map((a) => [String(a.test_id), a]));
     const out = [];
     for (const t of tests) {
-      if (exam.isRound2(t)) continue;
+      if (exam.isRound2(t) && !req.student.round2_winner) continue;
       const att = byTest.get(String(t.id));
       out.push({
         id: t.id,
@@ -296,8 +297,12 @@ router.post('/tests/:id/run', async (req, res) => {
     if (!att || att.status !== 'IN_PROGRESS') {
       return res.status(403).json({ error: 'Start the test before running code.' });
     }
-    const ok = isDebugFixCorrect(q, code);
-    return res.json({ result: ok ? 'Correct' : 'Error' });
+    // Execution-based feedback: compile + run the submitted program against the
+    // question's sample input. Correct shows the real output; otherwise the
+    // console shows the error type WITHOUT exposing the exact erroring line.
+    const meta = debugRunMeta(q);
+    const resrun = await runC(code, meta);
+    return res.json({ result: resrun.result, console: resrun.console });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: 'Server error.' });

@@ -20,6 +20,7 @@ const CURATED = [
     key: 'num=num+i',
     mode: 'override',
     required: ['scanf("%d",&n);'],
+    forbidden: ['num=num+i'],
   },
   {
     key: 'findmaxindex',
@@ -40,6 +41,25 @@ const CURATED = [
     forbidden: ['for(inti=0;i<=2;i++)', 'for(intj=0;j<=2;j++)', 'b[j][i]'],
   },
 ];
+
+// Sample stdin + expected-output fragments used by the interactive Run button.
+// The submitted C program is compiled and executed with `input` on stdin; when
+// its output contains every `contains` fragment the run counts as Correct,
+// otherwise the run is reported as an error (the exact line is never shown).
+const RUN_META = [
+  { key: 'after swap', input: '5\n10\n', contains: ['After swap: 10 5'] },
+  { key: 'palindrome', input: '123\n', contains: ['Not Palindrome'] },
+  { key: 'average', input: '3\n1\n2\n3\n', contains: ['Sum = 6', 'Average = 2.000000'] },
+  { key: 'num=num+i', input: '4\n', contains: ['7 8 9 10'] },
+  { key: 'findmaxindex', input: '4\n5\n3\n8\n2\n', contains: ['Index of max element: 2'] },
+  { key: 'int a[2][2], b[2][2]', input: '1\n2\n3\n4\n5\n6\n7\n8\n', contains: ['6 8', '10 12'] },
+];
+
+function debugRunMeta(question) {
+  const text = String(question.question_text || '').toLowerCase();
+  const hit = RUN_META.find((m) => text.includes(m.key));
+  return hit;
+}
 
 function rubric(question) {
   const text = String(question.question_text || '').toLowerCase();
@@ -70,4 +90,4 @@ function isDebugFixCorrect(question, studentCode) {
   return true;
 }
 
-module.exports = { isDebugFixCorrect, rubric };
+module.exports = { isDebugFixCorrect, rubric, debugRunMeta };

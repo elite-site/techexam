@@ -57,8 +57,16 @@ export default function AdminLeaderboards() {
         <div className="card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <h3 className="font-bold text-ink">{data.test.name}{data.test.round ? ` — Round ${data.test.round}` : ''} Leaderboard</h3>
-            <span className="badge-gray">{data.leaderboard.length} entries</span>
+            <div className="flex items-center gap-2">
+              {data.top10 && <span className="badge-green">Top 10</span>}
+              <span className="badge-gray">{data.leaderboard.length} entries</span>
+            </div>
           </div>
+          {data.test.type === 'quiz' && Number(data.test.round) === 1 && (
+            <div className="px-5 pt-4 text-sm text-slate-500">
+              The top 10 participants of Round 1 are listed. Press <b>SELECT</b> to let a student participate in Round 2 — Round 2 will then appear for them in the student portal.
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
@@ -70,7 +78,7 @@ export default function AdminLeaderboards() {
                   <th className="px-4 py-3 font-semibold">Correct</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   {data.test.type === 'quiz' && Number(data.test.round) === 1 && (
-                    <th className="px-4 py-3 font-semibold">Round 2 Winner</th>
+                    <th className="px-4 py-3 font-semibold">Round 2 Selection</th>
                   )}
                 </tr>
               </thead>
@@ -96,13 +104,13 @@ export default function AdminLeaderboards() {
                         <button
                           type="button"
                           onClick={() => toggleWinner(r)}
-                          className={`text-xs px-2.5 py-1 rounded-full font-semibold transition-colors ${
+                          className={`text-xs px-3 py-1.5 rounded-full font-bold tracking-wide transition-colors ${
                             r.round2_winner
-                              ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                              ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-300 hover:bg-amber-200'
                               : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                           }`}
                         >
-                          {r.round2_winner ? '🏆 Round 2 Winner' : 'Mark Winner'}
+                          {r.round2_winner ? '✓ SELECTED' : 'SELECT'}
                         </button>
                       </td>
                     )}

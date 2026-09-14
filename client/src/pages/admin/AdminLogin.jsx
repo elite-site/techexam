@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Logo } from '../../components/Logo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function AdminLogin() {
-  const { adminLogin, role } = useAuth();
+  const { adminLogin } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
-  if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -49,9 +47,6 @@ export default function AdminLogin() {
             <button type="submit" disabled={busy} className="btn-primary w-full mt-2">{busy ? 'Signing in…' : 'Login'}</button>
           </form>
         </div>
-        <p className="text-center text-sm text-slate-400 mt-6">
-          <Link to="/student/login" className="hover:text-brand-600">← Student portal login</Link>
-        </p>
       </div>
     </div>
   );

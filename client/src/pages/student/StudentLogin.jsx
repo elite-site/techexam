@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Logo } from '../../components/Logo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -10,10 +10,6 @@ export default function StudentLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
-  if (role === 'student') {
-    return <Navigate to="/student/dashboard" replace />;
-  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -58,9 +54,6 @@ export default function StudentLogin() {
             Note: Your default password is the same as your Roll Number.
           </p>
         </div>
-        <p className="text-center text-sm text-slate-400 mt-6">
-          Looking for the admin? <Link to="/admin/login" className="hover:text-slate-600">Admin login →</Link>
-        </p>
       </div>
     </div>
   );

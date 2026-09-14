@@ -259,16 +259,18 @@ router.get('/leaderboard/:testId', async (req, res) => {
   const testId = Number(req.params.testId);
   const test = await exam.getTest(testId);
   if (!test) return res.status(404).json({ error: 'Test not found.' });
+  const top10 = test.type === 'quiz' && test.round === 1;
   const { rows } = await query(
     `SELECT s.id AS student_id, s.student_name, s.roll_number, s.year, s.section, s.round2_winner,
             a.score, a.correct_count, a.total_count, a.submitted_at, a.status
      FROM attempts a
      JOIN students s ON s.id = a.student_id
      WHERE a.test_id = $1 AND a.status IN ('SUBMITTED','EXPIRED')
-     ORDER BY a.score DESC, a.submitted_at ASC NULLS LAST`,
+     ORDER BY a.score DESC, a.submitted_at ASC NULLS LAST
+     ${top10 ? 'LIMIT 10' : ''}`,
     [testId]
   );
-  return res.json({ test, leaderboard: rows });
+  return res.json({ test, top10, leaderboard: rows });
 });
 
 // Admin promotes/removes a student as a Round 2 participant (only meaningful

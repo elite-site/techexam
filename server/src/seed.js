@@ -27,7 +27,7 @@ async function seedTests() {
   const defs = [
     { name: 'Code Debugging', type: 'debugging', round: null, duration: 1800 },
     { name: 'Technical Quiz', type: 'quiz', round: 1, duration: 1800 },
-    { name: 'Technical Quiz', type: 'quiz', round: 2, duration: 3600 },
+    { name: 'Technical Quiz', type: 'quiz', round: 2, duration: 1800 },
   ];
   const ids = {};
   for (const d of defs) {
