@@ -58,9 +58,11 @@ easy problems from the odt (sum of 1..n, average of a fixed array) are replaced 
 with sum-of-digits and factorial `while`-loop problems (defined in `server/src/debugCheck.js`,
 keyed `ROUND1_HARDER`). Palindrome, min/max, sort and duplicates are untouched.
 
-Submit-time partial-credit grading accepts common equivalent fix spellings (e.g. a `for`-loop
-factorial, compound assignment `n/=10`, renamed palindrome temp variables) so a correct but
-differently-written fix still scores full marks.
+Submit-time partial-credit grading accepts common equivalent fix spellings for every
+problem — e.g. a `for`-loop factorial, compound assignment `n/=10` / `c[i][j] = c[i][j] + ...`,
+`INT_MIN`/`INT_MAX` min-max init, renamed palindrome temp variables, `if(found)` vs `if(found==1)`,
+`if(!strcmp(...))`, `&a[n-1]` vs `a + n - 1` — so a correct but differently-written fix still
+scores full marks.
 
 ## Quick start
 

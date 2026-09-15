@@ -27,12 +27,22 @@ const CURATED = [
     mode: 'override',
     required: ['scanf("%d", &a[i]);', 'for(i = 0; i < 5; i++)', 'else if(a[i] > second && a[i] != largest)', 'printf("Second largest = %d", second);'],
     forbidden: ['for(i = 0; i <= 5; i++)', 'scanf("%d", a[i]);', 'else if(a[i] < second)', 'second", second)printf("Thank'],
+    alt: {
+      'elseif(a[i]>second&&a[i]!=largest)': ['else if(a[i] > second && a[i] < largest)'],
+      'printf("secondlargest=%d",second);': ['printf("Second largest = %d\\n", second);'],
+    },
   },
   {
     key: 'armstrong',
     mode: 'override',
     required: ['#include <stdio.h>', 'int n, temp, digit, sum = 0;', 'scanf("%d", &n);', 'while(temp > 0)', 'sum = sum + digit * digit * digit;', 'if(sum == n)', 'printf("Sum = %d\\n", sum);'],
     forbidden: ['#include <stdo.h>', 'sum = 1;', 'scanf("%d", n);', 'while(temp >= 0)', 'sum = sum + digit * digit;', 'if(sum = n)'],
+    alt: {
+      'sum=sum+digit*digit*digit;': ['sum += digit * digit * digit;', 'sum += pow(digit, 3);'],
+      'if(sum==n)': ['if(n == sum)'],
+      'while(temp>0)': ['while(temp > 0)'],
+      'printf("sum=%d\\n",sum);': ['printf("Sum = %d\\n", sum);'],
+    },
   },
   {
     key: 'matrix a:',
@@ -40,24 +50,37 @@ const CURATED = [
     required: ['scanf("%d", &b[i][j]);', 'c[i][j] = 0;', 'c[i][j] += a[i][k] * b[k][j];'],
     requiredCS: ['scanf("%d", &a[i][j]);'],
     forbidden: ['scanf("%d", b[i][j]);', 'c[i][j] = 1;', 'c[i][j] = a[i][k] * b[k][j];', 'for(i = 0; i <= 3; i++)', 'for(j = 0; j <= 3; j++)'],
+    alt: {
+      'c[i][j]+=a[i][k]*b[k][j];': ['c[i][j] = c[i][j] + a[i][k] * b[k][j];'],
+    },
   },
   {
     key: 'binary search',
     mode: 'override',
     required: ['if(a[j] > a[j + 1])', 'high = n - 1;', 'else if(a[mid] > key)', 'high = mid - 1;', 'low = mid + 1;', 'if(found == 1)', 'printf("Element found at position %d\\n", mid + 1);'],
     forbidden: ['if(a[j] < a[j + 1])', 'high = n;', 'low = mid - 1;', 'high = mid + 1;', 'if(found = 1)', 'a[mid] < key'],
+    alt: {
+      'if(found==1)': ['if(found)'],
+    },
   },
   {
     key: 'struct student',
     mode: 'override',
     required: ['memcpy(&copy, &s[highest], sizeof(struct Student));', 'if(strcmp(s[highest].name, copy.name) == 0)', '%p'],
     forbidden: ['memcpy(&copy, s, sizeof(s));', 's[highest].average = s[highest].average / 3;', 's[i].average > 100', 'printf("Address of top student: %d', 'free(s);printf("Top student: %s'],
+    alt: {
+      'if(strcmp(s[highest].name,copy.name)==0)': ['if(!strcmp(s[highest].name, copy.name))'],
+    },
   },
   {
     key: 'findlargest',
     mode: 'override',
     required: ['if(a[n - 1] > largest)', 'largest = a[n - 1];', 'return a[n - 1] + findSum(a, n - 1);', '(float)sum / n);', 'printf("\\nNumber of elements = %d\\n", n);', 'int *ptr = a + n - 1;'],
     forbidden: ['if(a[n] > largest)', 'largest = a[n];', 'return a[n] + findSum(a, n - 1);', '(float)sum / (n - 1));', 'sizeof(a));'],
+    alt: {
+      'int*ptr=a+n-1;': ['int *ptr = &a[n - 1];'],
+      'if(a[n-1]>largest)': ['if(a[n - 1] >= largest)'],
+    },
   },
   // --- NEW .odt debugging set (must precede old keys; several old keys
   // --- like "sum = 0;", "palindrome", "average" also substring-match new texts)
@@ -66,12 +89,18 @@ const CURATED = [
     mode: 'override',
     required: ['scanf("%d",&n);'],
     forbidden: ['scanf("%d",n);'],
+    alt: {
+      'scanf("%d",&n);': ['scanf(" %d", &n);'],
+    },
   },
   {
     key: 'arr[5] = {10',
     mode: 'override',
     required: ['for(inti=0;i<5;i++)'],
     forbidden: ['for(inti=0;i<=5;i++)'],
+    alt: {
+      'for(inti=0;i<5;i++)': ['for(i = 0; i < 5; i++)'],
+    },
   },
   {
     key: 'reversed = 0, remainder',
@@ -88,6 +117,10 @@ const CURATED = [
     mode: 'override',
     required: ['largest=arr[0];', 'smallest=arr[0];'],
     forbidden: ['largest=0;', 'smallest=0;'],
+    alt: {
+      'largest=arr[0];': ['largest = INT_MIN;', 'largest = a[0];'],
+      'smallest=arr[0];': ['smallest = INT_MAX;', 'smallest = a[0];'],
+    },
   },
   {
     key: 'temp = arr[j];',
@@ -100,6 +133,9 @@ const CURATED = [
     mode: 'override',
     required: ['for(j=i+1;j<n;j++)'],
     forbidden: ['for(j=0;j<n;j++)', 'if(count>1)'],
+    alt: {
+      'for(j=i+1;j<n;j++)': ['for(j = i + 1; j <= n - 1; j++)'],
+    },
   },
   // --- Round 1 harder replacements (sum of digits via while, factorial via while)
   {
@@ -127,24 +163,37 @@ const CURATED = [
     mode: 'override',
     required: ['scanf("%d",&n);'],
     forbidden: ['num=num+i'],
+    alt: {
+      'scanf("%d",&n);': ['scanf(" %d", &n);'],
+    },
   },
   {
     key: 'findmaxindex',
     mode: 'override',
     required: ['if(arr[i]>max)', 'intindex=0;', 'returnindex;', 'for(inti=0;i<n;i++)'],
     forbidden: ['if(arr[i]>max);'],
+    alt: {
+      'for(inti=0;i<n;i++)': ['for(i = 0; i < n; i++)'],
+      'returnindex;': ['return (index);'],
+    },
   },
   {
     key: 'sum = 0;',
     mode: 'override',
     required: ['avg=(float)sum/n;'],
     forbidden: ['for(inti=0;i<=n;i++)'],
+    alt: {
+      'avg=(float)sum/n;': ['avg = sum / (float)n;', 'avg = (float)sum / (float)n;'],
+    },
   },
   {
     key: 'int a[2][2], b[2][2]',
     mode: 'override',
     required: ['sum[i][j]=a[i][j]+b[i][j];'],
     forbidden: ['for(inti=0;i<=2;i++)', 'for(intj=0;j<=2;j++)', 'b[j][i]'],
+    alt: {
+      'sum[i][j]=a[i][j]+b[i][j];': ['sum[i][j] = a[i][j] + b[i][j];'],
+    },
   },
 ];
 
