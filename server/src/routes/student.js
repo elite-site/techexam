@@ -163,12 +163,11 @@ router.put('/tests/:id/answers', async (req, res) => {
       const validIds = new Set(valid.map((q) => q.id));
       const params = [];
       const values = [];
-      for (let i = 0; i < body.length; i++) {
-        const a = body[i];
+      for (const a of body) {
         const qid = Number(a.question_id);
         if (!qid || !validIds.has(qid)) continue;
         const answer = String(a.answer ?? '').trim();
-        const base = i * 3;
+        const base = params.length;
         params.push(att.id, qid, answer);
         values.push(`($${base + 1}, $${base + 2}, $${base + 3})`);
       }
@@ -219,14 +218,14 @@ router.post('/tests/:id/submit', async (req, res) => {
       const validIds = new Set(valid.map((q) => q.id));
       const params = [];
       const values = [];
-      body.forEach((a, i) => {
+      for (const a of body) {
         const qid = Number(a.question_id);
-        if (!qid || !validIds.has(qid)) return;
+        if (!qid || !validIds.has(qid)) continue;
         const answer = String(a.answer ?? '').trim();
-        const base = i * 3;
+        const base = params.length;
         params.push(att.id, qid, answer);
         values.push(`($${base + 1}, $${base + 2}, $${base + 3})`);
-      });
+      }
       if (values.length) {
         await client.query(
           `INSERT INTO answers (attempt_id, question_id, student_answer)
@@ -307,7 +306,7 @@ router.post('/tests/:id/run', async (req, res) => {
     // Execution-based feedback: compile + run the submitted program against the
     // question's sample input. Correct shows the real output; otherwise the
     // console shows the error type WITHOUT exposing the exact erroring line.
-    const meta = debugRunMeta(q);
+    const meta = debugRunMeta(q) || {};
     const rub = rubric(q);
     meta.forbidden = [...new Set((meta.forbidden || []).concat(rub.forbidden || []))];
     const resrun = await runC(code, meta);

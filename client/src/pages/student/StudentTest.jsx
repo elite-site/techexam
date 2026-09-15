@@ -319,9 +319,6 @@ export default function StudentTest() {
         question_id: Number(qid),
         answer: v.letter || v.value || '',
       }));
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(new Blob([JSON.stringify({ answers: payload })], { type: 'application/json' }), null);
-      }
       fetch(`/api/student/tests/${testId}/answers`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + getStudentToken() },
