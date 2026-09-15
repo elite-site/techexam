@@ -43,6 +43,10 @@ Round 2 of both the Technical Quiz and Code Debugging is **winner-gated**: a tes
 appears for students the admin has marked as a Round 2 participant (`students.round2_winner`),
 toggled from the Round 1 leaderboard.
 
+Technical Quiz questions are **jumbled per student**: each student receives a unique,
+deterministic question order (stable across refreshes/resumes) seeded from their student id
+and the test id. Code Debugging questions keep their fixed order.
+
 404 students imported from `Combined Student List.xlsx`. Question sources when the `.odt`
 files are present: Round 1/2 quiz → `NEW-ROUND-1.odt` / `NEW-ROUND-2.odt`;
 Code Debugging Round 1 → `NEW-DEBUGGING.odt`; Code Debugging Round 2 → `CODEBUGGING.txt`

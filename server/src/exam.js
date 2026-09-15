@@ -29,7 +29,28 @@ async function getAnswerMap(attemptId, exec) {
   return new Map(rows.map((r) => [Number(r.question_id), r.student_answer ?? '']));
 }
 
-async function getQuestions(testId, includeCorrect = false, exec) {
+// Deterministic per-student shuffle: a stable seed yields the same
+// permutation on every call so a refresh/resume keeps the same order,
+// while each student sees a unique arrangement of questions.
+function seededShuffle(arr, seedStr) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < seedStr.length; i++) {
+    h ^= seedStr.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const rand = () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 3266489909) >>> 0;
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+async function getQuestions(testId, includeCorrect = false, exec, opts = {}) {
   const q = exec || query;
   const cols = includeCorrect
     ? '*'
@@ -38,7 +59,9 @@ async function getQuestions(testId, includeCorrect = false, exec) {
     `SELECT ${cols} FROM questions WHERE test_id = $1 ORDER BY question_order ASC, id ASC`,
     [testId]
   );
-  return rows.map((r) => ({ ...r, id: Number(r.id) }));
+  const out = rows.map((r) => ({ ...r, id: Number(r.id) }));
+  // opts.seed (e.g. `${studentId}:${testId}`) jumbles the order per student.
+  return opts.seed ? seededShuffle(out, opts.seed) : out;
 }
 
 // Finalize an attempt that has run out of time (or was force-submitted).
@@ -101,4 +124,4 @@ async function createOrGetAttempt(trx, studentId, testId) {
   return rows[0];
 }
 
-module.exports = { STATUS, remainingSeconds, isRound2, getTest, getAnswerMap, getQuestions, finalizeAttempt, autoExpireIfNeeded, createOrGetAttempt };
+module.exports = { STATUS, remainingSeconds, isRound2, getTest, getAnswerMap, getQuestions, finalizeAttempt, autoExpireIfNeeded, createOrGetAttempt, seededShuffle };

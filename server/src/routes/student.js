@@ -12,6 +12,13 @@ function round2Blocked(res) {
   return res.status(403).json({ error: 'This test is not available to you.' });
 }
 
+// Per-student jumbled order for the Technical Quiz only: a stable seed derived
+// from the student id + test id gives every student a unique question order
+// that stays fixed across refreshes and resumes. Debugging stays in order.
+function quizSeed(studentId, test) {
+  return test && test.type === 'quiz' ? `${studentId}:${test.id}` : null;
+}
+
 function attemptState(attempt, test) {
   const base = attempt
     ? {
@@ -88,7 +95,7 @@ router.post('/tests/:id/start', async (req, res) => {
       if (att.status === 'SUBMITTED' || att.status === 'EXPIRED') {
         return res.json({ already_completed: true, attempt: attemptState(att, test), test: { id: test.id, name: test.name, type: test.type, round: test.round, duration_seconds: Number(test.duration_seconds), status: test.status } });
       }
-      const questions = await exam.getQuestions(testId, false, client.query.bind(client));
+      const questions = await exam.getQuestions(testId, false, client.query.bind(client), { seed: quizSeed(req.student.id, test) });
       const answers = await exam.getAnswerMap(att.id, client.query.bind(client));
       const answersObj = {};
       answers.forEach((v, k) => { answersObj[k] = v; });
@@ -96,7 +103,7 @@ router.post('/tests/:id/start', async (req, res) => {
     }
     const attempt = await exam.createOrGetAttempt(client, req.student.id, testId);
     await client.query('COMMIT');
-    const questions = await exam.getQuestions(testId, false, client.query.bind(client));
+    const questions = await exam.getQuestions(testId, false, client.query.bind(client), { seed: quizSeed(req.student.id, test) });
     return res.json({ success: true, test: { id: test.id, name: test.name, type: test.type, round: test.round, duration_seconds: Number(test.duration_seconds), status: test.status }, attempt: attemptState(attempt, test), questions, answers: {}, server_time: Date.now() });
   } catch (e) {
     await client.query('ROLLBACK').catch(() => {});
@@ -122,7 +129,7 @@ router.get('/tests/:id/attempt', async (req, res) => {
   const expired = att.status === 'IN_PROGRESS' && exam.remainingSeconds(att, test) <= 0;
   if (expired) await exam.autoExpireIfNeeded(att, test);
   const fresh = (await query('SELECT * FROM attempts WHERE id = $1', [att.id])).rows[0];
-  const questions = await exam.getQuestions(testId, false);
+  const questions = await exam.getQuestions(testId, false, null, { seed: quizSeed(req.student.id, test) });
   const answers = await exam.getAnswerMap(att.id);
   const answersObj = {};
   answers.forEach((v, k) => { answersObj[k] = v; });
