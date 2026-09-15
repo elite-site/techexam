@@ -45,7 +45,7 @@ toggled from the Round 1 leaderboard.
 
 404 students imported from `Combined Student List.xlsx`. Question sources when the `.odt`
 files are present: Round 1/2 quiz → `NEW-ROUND-1.odt` / `NEW-ROUND-2.odt`;
-Code Debugging Round 1 → `CODEBUGGING.txt`; Code Debugging Round 2 → `NEW-DEBUGGING.odt`
+Code Debugging Round 1 → `NEW-DEBUGGING.odt`; Code Debugging Round 2 → `CODEBUGGING.txt`
 (falls back to `Technical Quiz (First Round).txt` / `debugquestion.txt` for the quiz and R1
 debugging when the odt files are absent).
 

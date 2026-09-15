@@ -148,12 +148,13 @@ function sourcePack() {
   const r2 = config.resolveRel('../NEW-ROUND-2.odt');
   const dbg = config.resolveRel('../NEW-DEBUGGING.odt');
   const cb = config.resolveRel('../CODEBUGGING.txt');
-  // Debugging Round 1 questions come from CODEBUGGING.txt when present.
-  const debug = fileExists(cb)
-    ? parseCodebuggingFile(fs.readFileSync(cb, 'utf8'))
-    : fileExists(dbg) ? parseNewDebug(extractOdtText(dbg)) : [];
-  // Debugging Round 2 questions come from NEW-DEBUGGING.odt when present.
-  const debugR2 = fileExists(dbg) ? parseNewDebug(extractOdtText(dbg)) : [];
+  // Code Debugging Round 1 questions come from NEW-DEBUGGING.odt when present.
+  const debug = fileExists(dbg)
+    ? parseNewDebug(extractOdtText(dbg))
+    : fileExists(cb) ? parseCodebuggingFile(fs.readFileSync(cb, 'utf8'))
+    : parseDebug(fs.readFileSync(config.debugPath, 'utf8'));
+  // Code Debugging Round 2 questions come from CODEBUGGING.txt when present.
+  const debugR2 = fileExists(cb) ? parseCodebuggingFile(fs.readFileSync(cb, 'utf8')) : [];
   if (fileExists(r1) && fileExists(r2)) {
     return {
       kind: fileExists(cb) ? 'odt+codebugging' : 'odt',
@@ -167,7 +168,7 @@ function sourcePack() {
     kind: 'txt',
     round1: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round1,
     round2: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round2,
-    debug: fileExists(cb) ? debug : parseDebug(fs.readFileSync(config.debugPath, 'utf8')),
+    debug,
     debugR2,
   };
 }
