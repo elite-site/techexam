@@ -53,6 +53,11 @@ Code Debugging Round 1 → `NEW-DEBUGGING.odt`; Code Debugging Round 2 → `CODE
 (falls back to `Technical Quiz (First Round).txt` / `debugquestion.txt` for the quiz and R1
 debugging when the odt files are absent).
 
+Round 1 Code Debugging difficulty ladder (easy loop/while → basic → DSA): the two trivially
+easy problems from the odt (sum of 1..n, average of a fixed array) are replaced at seed time
+with sum-of-digits and factorial `while`-loop problems (defined in `server/src/debugCheck.js`,
+keyed `ROUND1_HARDER`). Palindrome, min/max, sort and duplicates are untouched.
+
 ## Quick start
 
 ```bash

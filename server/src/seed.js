@@ -142,6 +142,26 @@ function fileExists(p) {
   try { fs.accessSync(p); return true; } catch (e) { return false; }
 }
 
+// Round 1 Code Debugging: swap the two trivially easy NEW-DEBUGGING.odt questions
+// (Sum of 1..n, average of a fixed array) for the slightly harder loop/while
+// problems defined in debugCheck.js. Non-DSA; Q3-Q6 (palindrome, min/max, sort,
+// duplicates) are left untouched. Matches are keyed by stable substrings.
+function applyRound1Replacements(questions) {
+  const { ROUND1_HARDER } = require('./debugCheck');
+  const out = questions.slice();
+  for (const rep of ROUND1_HARDER) {
+    const i = out.findIndex((q) => String(q.question_text || '').includes(rep.key));
+    if (i === -1) continue;
+    out[i] = {
+      ...out[i],
+      description: rep.description,
+      question_text: `Identify and fix the error(s) in the following C program. Write the corrected line(s) / code.\n\n${rep.buggy}`,
+      correct_answer: rep.fixed,
+    };
+  }
+  return out;
+}
+
 // Prefer the uploaded NEW-*.odt question sets when present.
 function sourcePack() {
   const r1 = config.resolveRel('../NEW-ROUND-1.odt');
@@ -205,7 +225,7 @@ async function main() {
   await convertSelectableText(ids['quiz|2']);
   console.log(`[4/5] round1 questions=${src.round1.length} (seeded ${nR1}), round2 questions=${src.round2.length} (seeded ${nR2})`);
 
-  const debugR1 = src.debug;
+  const debugR1 = applyRound1Replacements(src.debug);
   const nDbg1 = await seedQuestions(ids['debugging|1'], debugR1, 5);
   await convertSelectableText(ids['debugging|1']);
   const debugR2 = src.debugR2;

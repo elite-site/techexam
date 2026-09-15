@@ -97,6 +97,19 @@ const CURATED = [
     required: ['for(j=i+1;j<n;j++)'],
     forbidden: ['for(j=0;j<n;j++)', 'if(count>1)'],
   },
+  // --- Round 1 harder replacements (sum of digits via while, factorial via while)
+  {
+    key: 'sum + digit',
+    mode: 'override',
+    required: ['sum=0;', 'n=n/10;'],
+    forbidden: ['sum=1;', 'n=n/100;'],
+  },
+  {
+    key: 'fact = fact * i',
+    mode: 'override',
+    required: ['fact=1;', 'while(i<=n)'],
+    forbidden: ['fact=0;', 'while(i<n)'],
+  },
   // --- original txt-based debugging set
   {
     key: 'num=num+i',
@@ -251,6 +264,36 @@ const FIXED = {
     'return 0;',
     '}',
   ].join('\n'),
+  sumdigits: [
+    '#include <stdio.h>',
+    'int main() {',
+    'int n, digit, sum = 0;',
+    'printf("Enter a number: ");',
+    'scanf("%d", &n);',
+    'while(n > 0) {',
+    'digit = n % 10;',
+    'sum = sum + digit;',
+    'n = n / 10;',
+    '}',
+    'printf("Sum of digits = %d\\n", sum);',
+    'return 0;',
+    '}',
+  ].join('\n'),
+  factorial: [
+    '#include <stdio.h>',
+    'int main() {',
+    'int n, i, fact = 1;',
+    'printf("Enter a number: ");',
+    'scanf("%d", &n);',
+    'i = 1;',
+    'while(i <= n) {',
+    'fact = fact * i;',
+    'i++;',
+    '}',
+    'printf("Factorial = %d\\n", fact);',
+    'return 0;',
+    '}',
+  ].join('\n'),
 };
 
 const FIXED_CB = {
@@ -275,6 +318,9 @@ const RUN_META = [
   { key: 'int arr[10], n;', input: '3\n-5\n-1\n-7\n', canonical: FIXED.minmax },
   { key: 'temp = arr[j];', input: '4\n3\n1\n2\n4\n', canonical: FIXED.sort },
   { key: 'duplicate elements:', input: '5\n1\n2\n1\n3\n1\n', canonical: FIXED.dups },
+  // Round 1 harder replacements
+  { key: 'sum + digit', input: '1234\n', canonical: FIXED.sumdigits },
+  { key: 'fact = fact * i', input: '5\n', canonical: FIXED.factorial },
   // original txt-based set (contains-based)
   { key: 'after swap', input: '5\n10\n', contains: ['After swap: 10 5'] },
   { key: 'palindrome', input: '123\n', contains: ['Not Palindrome'] },
@@ -333,4 +379,47 @@ function isDebugFixCorrect(question, studentCode) {
   return scoreDebugFix(question, studentCode) === 1;
 }
 
-module.exports = { isDebugFixCorrect, scoreDebugFix, rubric, debugRunMeta };
+// Round 1 Code Debugging: the two trivially easy problems from NEW-DEBUGGING.odt
+// (Sum of 1..n, average of a fixed array) are swapped at seed time for slightly
+// harder loop/while problems — still easy, still non-DSA. Each entry is keyed by
+// a stable substring of the original question_text and fully replaces it.
+const ROUND1_HARDER = [
+  {
+    key: 'sum += i;',
+    description: 'Find the sum of digits of a positive integer using a while loop.',
+    buggy: `#include <stdio.h>
+int main() {
+int n, digit, sum = 1;
+printf("Enter a number: ");
+scanf("%d", &n);
+while(n > 0) {
+digit = n % 10;
+sum = sum + digit;
+n = n / 100;
+}
+printf("Sum of digits = %d\\n", sum);
+return 0;
+}`,
+    fixed: 'sum = 0;\nn = n / 10;',
+  },
+  {
+    key: 'arr[5] = {10',
+    description: 'Find the factorial of a number using a while loop.',
+    buggy: `#include <stdio.h>
+int main() {
+int n, i, fact = 0;
+printf("Enter a number: ");
+scanf("%d", &n);
+i = 1;
+while(i < n) {
+fact = fact * i;
+i++;
+}
+printf("Factorial = %d\\n", fact);
+return 0;
+}`,
+    fixed: 'fact = 1;\nwhile(i <= n)',
+  },
+];
+
+module.exports = { isDebugFixCorrect, scoreDebugFix, rubric, debugRunMeta, ROUND1_HARDER };
