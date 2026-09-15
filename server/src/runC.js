@@ -29,10 +29,16 @@ function stripAll(s) {
   return String(s).toLowerCase().replace(/\s+/g, '');
 }
 
-// Mask heap addresses (0x... hex, or long decimal from %d of a pointer) so a
-// reference run and a student run compare equal apart from the address value.
+// Mask heap addresses (0x... hex, MSYS/MinGW %p like 000001d4a9441260, or long
+// decimal from %d of a pointer) so a reference run and a student run compare
+// equal apart from the address value. Only addresses vary between two runs of
+// the same program; deterministic large numbers are masked identically on both
+// sides and therefore still compare equal.
 function maskAddrs(s) {
-  return String(s).replace(/0x[0-9a-fA-F]+/g, '#').replace(/\b\d{7,}\b/g, '#');
+  return String(s)
+    .replace(/0x[0-9a-fA-F]+/g, '#')
+    .replace(/\b\d{7,}\b/g, '#')
+    .replace(/\b[0-9a-fA-F]{8,}\b/g, '#');
 }
 
 function matches(actual, contains) {
