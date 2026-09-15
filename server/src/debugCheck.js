@@ -78,6 +78,10 @@ const CURATED = [
     mode: 'override',
     required: ['intoriginal=n;', 'if(original==reversed)'],
     forbidden: ['printf("reversed number = %d\\n", n);', 'if(n==reversed)'],
+    alt: {
+      'intoriginal=n;': ['int orig = n;', 'int temp = n;'],
+      'if(original==reversed)': ['if(orig==reversed)', 'if(original==rev)', 'if(orig==rev)'],
+    },
   },
   {
     key: 'int arr[10], n;',
@@ -103,12 +107,19 @@ const CURATED = [
     mode: 'override',
     required: ['sum=0;', 'n=n/10;'],
     forbidden: ['sum=1;', 'n=n/100;'],
+    alt: {
+      'n=n/10;': ['n/=10;'],
+    },
   },
   {
     key: 'fact = fact * i',
     mode: 'override',
     required: ['fact=1;', 'while(i<=n)'],
     forbidden: ['fact=0;', 'while(i<n)'],
+    alt: {
+      'while(i<=n)': ['for(i=1;i<=n;i++)', 'for(i=1;i<n+1;i++)'],
+      'fact=1;': ['fact=1', 'fact = 1'],
+    },
   },
   // --- original txt-based debugging set
   {
@@ -345,6 +356,7 @@ function rubric(question) {
       required: (override.required || []).map(normLine),
       requiredCS: (override.requiredCS || []).map(stripWS),
       forbidden: (override.forbidden || []).map(normLine),
+      alt: override.alt || {},
     };
   }
   const required = String(question.correct_answer || '')
@@ -360,16 +372,21 @@ function rubric(question) {
 // Fraction of correction applied by the student's program, in [0, 1].
 // Each required fragment must be present, each requiredCS fragment must be
 // present with exact casing, and each forbidden (buggy) fragment must be gone.
-// The fraction is the share of those checks that pass, so partial fixes earn
-// partial marks (a student who fixes 4 of 6 bugs gets 4/6 of the marks).
+// A missing required fragment still counts as fixed when one of its alternate
+// (alt) spellings is present — e.g. a for-loop factorial instead of a while
+// loop.  The fraction is the share of those checks that pass, so partial fixes
+// earn partial marks (a student who fixes 4 of 6 bugs gets 4/6 of the marks).
 function scoreDebugFix(question, studentCode) {
-  const { required, requiredCS, forbidden } = rubric(question);
+  const { required, requiredCS, forbidden, alt } = rubric(question);
   const total = required.length + requiredCS.length + forbidden.length;
   if (!total) return 0;
   const norm = normLine(studentCode);
   const normCS = stripWS(studentCode);
   let ok = 0;
-  for (const f of required) if (norm.includes(f)) ok += 1;
+  for (const f of required) {
+    if (norm.includes(f)) ok += 1;
+    else if (alt && alt[f] && alt[f].some((a) => norm.includes(normLine(a)))) ok += 1;
+  }
   for (const f of requiredCS) if (normCS.includes(f)) ok += 1;
   for (const f of forbidden) if (!norm.includes(f)) ok += 1;
   return ok / total;
