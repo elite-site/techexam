@@ -30,15 +30,24 @@ Supabase PostgreSQL (IPv4 pooler, SSL)
 - The frontend never sees correct answer keys — scoring happens entirely server-side.
 - Exam timing is authoritative: the server computes remaining seconds from `attempts.started_at + tests.duration_seconds` and auto-finalizes expired attempts.
 
-## Tests seeded (id 1–3)
+## Tests seeded
 
 | Id | Name | Type | Questions | Duration |
 | --- | --- | --- | --- | --- |
-| 1 | Code Debugging | debugging | 6 (5 marks each) | 30 min |
+| 1 | Code Debugging (Round 1) | debugging | 6 (5 marks each) | 30 min |
 | 2 | Technical Quiz (Round 1) | quiz | 30 (1 mark each) | 30 min |
-| 3 | Technical Quiz (Round 2) | quiz | 20 (1 mark each) | 60 min |
+| 3 | Technical Quiz (Round 2) | quiz | 30 (1 mark each) | 30 min |
+| 16 | Code Debugging (Round 2) | debugging | 6 (5 marks each) | 30 min |
 
-404 students imported from `Combined Student List.xlsx`; 56 questions parsed from `Technical Quiz (First Round).txt` and `debugquestion.txt`.
+Round 2 of both the Technical Quiz and Code Debugging is **winner-gated**: a test only
+appears for students the admin has marked as a Round 2 participant (`students.round2_winner`),
+toggled from the Round 1 leaderboard.
+
+404 students imported from `Combined Student List.xlsx`. Question sources when the `.odt`
+files are present: Round 1/2 quiz → `NEW-ROUND-1.odt` / `NEW-ROUND-2.odt`;
+Code Debugging Round 1 → `CODEBUGGING.txt`; Code Debugging Round 2 → `NEW-DEBUGGING.odt`
+(falls back to `Technical Quiz (First Round).txt` / `debugquestion.txt` for the quiz and R1
+debugging when the odt files are absent).
 
 ## Quick start
 

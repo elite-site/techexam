@@ -7,9 +7,10 @@ function remainingSeconds(attempt, test) {
   return Math.max(0, Math.floor((end - Date.now()) / 1000));
 }
 
-// Round 2 of the Technical Quiz is locked behind admin-confirmed winners.
+// Round 2 of any exam (Technical Quiz or Code Debugging) is locked behind
+// admin-confirmed winners (students.round2_winner).
 function isRound2(test) {
-  return !!(test && String(test.type) === 'quiz' && Number(test.round) === 2);
+  return !!(test && Number(test.round) === 2);
 }
 
 async function getTest(id, exec) {
@@ -46,13 +47,20 @@ async function finalizeAttempt(client, attempt, answerMap) {
   const { gradeAttempt } = require('./grading');
   const questions = await getQuestions(attempt.test_id, true, client.query.bind(client));
   const graded = gradeAttempt(questions, answerMap);
+  // Persist per-question marks so every answer records what it earned.
+  for (const [qid, marksAwarded] of graded.awarded) {
+    await client.query(
+      'UPDATE answers SET marks_awarded = $1 WHERE attempt_id = $2 AND question_id = $3',
+      [marksAwarded, attempt.id, qid]
+    );
+  }
   await client.query(
     `UPDATE attempts
      SET status = $2, submitted_at = now(), score = $3, correct_count = $4, total_count = $5
      WHERE id = $1`,
     [attempt.id, STATUS.SUBMITTED, graded.score, graded.correct, graded.total]
   );
-  return { score: graded.score, correct: graded.correct, total: graded.total };
+  return { score: graded.score, correct: graded.correct, total: graded.total, awarded: graded.awarded };
 }
 
 // If an in-progress attempt has hit zero time, finalize it (idempotent).

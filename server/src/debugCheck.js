@@ -311,17 +311,26 @@ function rubric(question) {
   return { required: [...new Set(required)], requiredCS: [], forbidden: [...new Set(forbidden)] };
 }
 
-function isDebugFixCorrect(question, studentCode) {
+// Fraction of correction applied by the student's program, in [0, 1].
+// Each required fragment must be present, each requiredCS fragment must be
+// present with exact casing, and each forbidden (buggy) fragment must be gone.
+// The fraction is the share of those checks that pass, so partial fixes earn
+// partial marks (a student who fixes 4 of 6 bugs gets 4/6 of the marks).
+function scoreDebugFix(question, studentCode) {
   const { required, requiredCS, forbidden } = rubric(question);
-  if (!required.length && !requiredCS.length && !forbidden.length) return false;
+  const total = required.length + requiredCS.length + forbidden.length;
+  if (!total) return 0;
   const norm = normLine(studentCode);
-  if (required.some((f) => !norm.includes(f))) return false;
-  if (requiredCS.length) {
-    const normCS = stripWS(studentCode);
-    if (requiredCS.some((f) => !normCS.includes(f))) return false;
-  }
-  if (forbidden.some((f) => norm.includes(f))) return false;
-  return true;
+  const normCS = stripWS(studentCode);
+  let ok = 0;
+  for (const f of required) if (norm.includes(f)) ok += 1;
+  for (const f of requiredCS) if (normCS.includes(f)) ok += 1;
+  for (const f of forbidden) if (!norm.includes(f)) ok += 1;
+  return ok / total;
 }
 
-module.exports = { isDebugFixCorrect, rubric, debugRunMeta };
+function isDebugFixCorrect(question, studentCode) {
+  return scoreDebugFix(question, studentCode) === 1;
+}
+
+module.exports = { isDebugFixCorrect, scoreDebugFix, rubric, debugRunMeta };

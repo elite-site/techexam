@@ -7,6 +7,7 @@
     "preinstall": "npm --prefix server install && npm --prefix client install",
     "setup": "npm --prefix server install && npm --prefix client install",
     "seed": "npm --prefix server run seed",
+    "db:reset": "npm --prefix server run db:reset",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
     "build": "npm --prefix client run build",

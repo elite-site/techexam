@@ -62,7 +62,7 @@ export default function AdminLeaderboards() {
               <span className="badge-gray">{data.leaderboard.length} entries</span>
             </div>
           </div>
-          {data.test.type === 'quiz' && Number(data.test.round) === 1 && (
+          {Number(data.test.round) === 1 && (
             <div className="px-5 pt-4 text-sm text-slate-500">
               The top 10 participants of Round 1 are listed. Press <b>SELECT</b> to let a student participate in Round 2 — Round 2 will then appear for them in the student portal.
             </div>
@@ -77,14 +77,14 @@ export default function AdminLeaderboards() {
                   <th className="px-4 py-3 font-semibold">Score</th>
                   <th className="px-4 py-3 font-semibold">Correct</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
-                  {data.test.type === 'quiz' && Number(data.test.round) === 1 && (
+                  {Number(data.test.round) === 1 && (
                     <th className="px-4 py-3 font-semibold">Round 2 Selection</th>
                   )}
                 </tr>
               </thead>
               <tbody>
                 {data.leaderboard.length === 0 && (
-                  <tr><td colSpan={data.test.type === 'quiz' && Number(data.test.round) === 1 ? 7 : 6} className="px-4 py-10 text-center text-slate-400">No submitted attempts yet.</td></tr>
+                  <tr><td colSpan={Number(data.test.round) === 1 ? 7 : 6} className="px-4 py-10 text-center text-slate-400">No submitted attempts yet.</td></tr>
                 )}
                 {data.leaderboard.map((r, i) => (
                   <tr key={r.student_id} className="border-t border-slate-100 hover:bg-slate-50/60">
@@ -99,7 +99,7 @@ export default function AdminLeaderboards() {
                     <td className="px-4 py-2.5 font-bold text-brand-700">{r.score}</td>
                     <td className="px-4 py-2.5 text-slate-500">{r.correct_count}/{r.total_count}</td>
                     <td className="px-4 py-2.5"><span className={r.status === 'EXPIRED' ? 'badge-gray' : 'badge-green'}>{r.status}</span></td>
-                    {data.test.type === 'quiz' && Number(data.test.round) === 1 && (
+                    {Number(data.test.round) === 1 && (
                       <td className="px-4 py-2.5">
                         <button
                           type="button"

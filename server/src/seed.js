@@ -25,9 +25,10 @@ async function ensureSchema() {
 
 async function seedTests() {
   const defs = [
-    { name: 'Code Debugging', type: 'debugging', round: null, duration: 1800 },
+    { name: 'Code Debugging', type: 'debugging', round: 1, duration: 1800 },
     { name: 'Technical Quiz', type: 'quiz', round: 1, duration: 1800 },
     { name: 'Technical Quiz', type: 'quiz', round: 2, duration: 1800 },
+    { name: 'Code Debugging', type: 'debugging', round: 2, duration: 1800 },
   ];
   const ids = {};
   for (const d of defs) {
@@ -147,16 +148,19 @@ function sourcePack() {
   const r2 = config.resolveRel('../NEW-ROUND-2.odt');
   const dbg = config.resolveRel('../NEW-DEBUGGING.odt');
   const cb = config.resolveRel('../CODEBUGGING.txt');
-  // Debugging questions come from CODEBUGGING.txt when present.
+  // Debugging Round 1 questions come from CODEBUGGING.txt when present.
   const debug = fileExists(cb)
     ? parseCodebuggingFile(fs.readFileSync(cb, 'utf8'))
     : fileExists(dbg) ? parseNewDebug(extractOdtText(dbg)) : [];
+  // Debugging Round 2 questions come from NEW-DEBUGGING.odt when present.
+  const debugR2 = fileExists(dbg) ? parseNewDebug(extractOdtText(dbg)) : [];
   if (fileExists(r1) && fileExists(r2)) {
     return {
       kind: fileExists(cb) ? 'odt+codebugging' : 'odt',
       round1: parseNewRound1(extractOdtText(r1)),
       round2: parseNewRound2(extractOdtText(r2)),
       debug,
+      debugR2,
     };
   }
   return {
@@ -164,6 +168,7 @@ function sourcePack() {
     round1: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round1,
     round2: parseQuizFile(fs.readFileSync(config.quizRound1Path, 'utf8')).round2,
     debug: fileExists(cb) ? debug : parseDebug(fs.readFileSync(config.debugPath, 'utf8')),
+    debugR2,
   };
 }
 
@@ -171,6 +176,10 @@ async function main() {
   console.log('=== ELITE seed ===');
   await ensureSchema();
   console.log('[1/5] schema ready');
+
+  // Renumber the legacy debugging test (round NULL) to Round 1 so Code
+  // Debugging follows the same R1 -> R2 winner flow as the Technical Quiz.
+  await query(`UPDATE tests SET round = 1 WHERE type = 'debugging' AND round IS NULL`);
 
   const ids = await seedTests();
   await seedAdmin();
@@ -195,10 +204,13 @@ async function main() {
   await convertSelectableText(ids['quiz|2']);
   console.log(`[4/5] round1 questions=${src.round1.length} (seeded ${nR1}), round2 questions=${src.round2.length} (seeded ${nR2})`);
 
-  const debugQ = src.debug;
-  const nDbg = await seedQuestions(ids['debugging|null'], debugQ, 5);
-  await convertSelectableText(ids['debugging|null']);
-  console.log(`[5/5] debugging questions=${debugQ.length} (seeded ${nDbg})`);
+  const debugR1 = src.debug;
+  const nDbg1 = await seedQuestions(ids['debugging|1'], debugR1, 5);
+  await convertSelectableText(ids['debugging|1']);
+  const debugR2 = src.debugR2;
+  const nDbg2 = await seedQuestions(ids['debugging|2'], debugR2, 5);
+  await convertSelectableText(ids['debugging|2']);
+  console.log(`[5/5] debugging R1 questions=${debugR1.length} (seeded ${nDbg1}), R2 questions=${debugR2.length} (seeded ${nDbg2})`);
 
   const sums = await query(
     `SELECT t.id, t.name, t.round, t.status, COUNT(q.id)::int AS q

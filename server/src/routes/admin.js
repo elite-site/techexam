@@ -20,8 +20,8 @@ router.get('/stats', async (req, res) => {
       query('SELECT COUNT(*)::int AS c FROM students'),
       query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.type = 'debugging' AND a.status IN ('IN_PROGRESS','SUBMITTED','EXPIRED')`),
       query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.type = 'debugging' AND a.status IN ('SUBMITTED','EXPIRED')`),
-      query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.round = 1 AND a.status IN ('SUBMITTED','EXPIRED')`),
-      query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.round = 2 AND a.status IN ('SUBMITTED','EXPIRED')`),
+      query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.type = 'quiz' AND t.round = 1 AND a.status IN ('SUBMITTED','EXPIRED')`),
+      query(`SELECT COUNT(*)::int AS c FROM attempts a JOIN tests t ON t.id = a.test_id WHERE t.type = 'quiz' AND t.round = 2 AND a.status IN ('SUBMITTED','EXPIRED')`),
     ]);
     const { rows: tests } = await query(
       `SELECT t.*, (SELECT COUNT(*)::int FROM questions q WHERE q.test_id = t.id) AS question_count,
@@ -259,7 +259,9 @@ router.get('/leaderboard/:testId', async (req, res) => {
   const testId = Number(req.params.testId);
   const test = await exam.getTest(testId);
   if (!test) return res.status(404).json({ error: 'Test not found.' });
-  const top10 = test.type === 'quiz' && test.round === 1;
+  // Round 1 leaderboards are limited to the top 10 so admins can pick
+  // Round 2 participants (Technical Quiz or Code Debugging).
+  const top10 = Number(test.round) === 1;
   const { rows } = await query(
     `SELECT s.id AS student_id, s.student_name, s.roll_number, s.year, s.section, s.round2_winner,
             a.score, a.correct_count, a.total_count, a.submitted_at, a.status
@@ -274,7 +276,8 @@ router.get('/leaderboard/:testId', async (req, res) => {
 });
 
 // Admin promotes/removes a student as a Round 2 participant (only meaningful
-// after Round 1 of the Technical Quiz). Backend flag gates Round 2 access.
+// after Round 1 of the Technical Quiz or Code Debugging). Backend flag gates
+// Round 2 access for both exams.
 router.post('/round2/winners/:studentId', async (req, res) => {
   try {
     const sid = Number(req.params.studentId);

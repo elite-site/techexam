@@ -9,8 +9,15 @@ const { execFileSync } = require('child_process');
 // ==========================================================================
 
 // Extract readable text out of an OpenDocument (text) zip container.
+// Prefers system `unzip`; falls back to `tar` (bundled with Windows 10+ and
+// most Linux images) so seeding works without extra tooling.
 function extractOdtText(filePath) {
-  const xml = execFileSync('unzip', ['-p', filePath, 'content.xml'], { maxBuffer: 16 * 1024 * 1024 }).toString('utf8');
+  let xml;
+  try {
+    xml = execFileSync('unzip', ['-p', filePath, 'content.xml'], { maxBuffer: 16 * 1024 * 1024 }).toString('utf8');
+  } catch (err) {
+    xml = execFileSync('tar', ['-xOf', filePath, 'content.xml'], { maxBuffer: 16 * 1024 * 1024 }).toString('utf8');
+  }
   const paras = [];
   const re = /<text:p\b[^>]*>([\s\S]*?)<\/text:p>/g;
   let m;

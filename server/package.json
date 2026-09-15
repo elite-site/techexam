@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "seed": "node src/seed.js",
+    "db:reset": "node src/resetSchema.js",
     "start": "node src/index.js",
     "dev": "node --watch src/index.js"
   },
